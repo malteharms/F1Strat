@@ -21,10 +21,11 @@ public class HelloApplication extends Application {
     public static void main(String[] args) {
         //launch();
 
-        String location = "test-data.json";
+        final String location = "f1-data.json";
 
+        // read file and parse it to object
         JsonHandler jsonHandler = new JsonHandler();
-        jsonHandler.loadData(location);
+        DataInstance data = jsonHandler.loadData(location);
 
     }
 }

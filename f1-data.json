@@ -1,5 +1,5 @@
 {
-    "dryCondition": {
+    "dry": {
         "settings": {
             "steeringAssistant": "off",
             "breakAssistant": "off",

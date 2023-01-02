@@ -3,28 +3,21 @@ package de.malte.f1strat.handler;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.json.simple.JSONArray;
+import de.malte.f1strat.DataInstance;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class JsonHandler {
 
-    public JSONObject loadData(String file) {
+    public DataInstance loadData(String file) {
         Object obj;
         JSONParser jsonParser = new JSONParser();
 
         try (FileReader reader = new FileReader(file)) {
             //Read JSON file
             obj = jsonParser.parse(reader);
-
-            JSONObject data = (JSONObject) obj;
-            System.out.println(data);
-
-            //Iterate over employee array
-            //data.forEach( emp -> parseEmployeeObject( (JSONObject) emp ) );
-
-            return data;
+            return new DataInstance((JSONObject) obj);
 
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -50,5 +43,4 @@ public class JsonHandler {
         String website = (String) employeeObject.get("website");
         System.out.println(website);
     }
-
 }
