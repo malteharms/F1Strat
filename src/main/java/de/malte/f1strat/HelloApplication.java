@@ -1,5 +1,6 @@
 package de.malte.f1strat;
 
+import de.malte.f1strat.handler.JsonHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,6 +19,12 @@ public class HelloApplication extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
+        //launch();
+
+        String location = "f1-data.json";
+
+        JsonHandler jsonHandler = new JsonHandler();
+        jsonHandler.loadData(location);
+
     }
 }
