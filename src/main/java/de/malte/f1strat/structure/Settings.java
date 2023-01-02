@@ -2,14 +2,14 @@ package de.malte.f1strat.structure;
 
 import org.json.simple.JSONObject;
 
-public class Settings {
+public class Settings extends Structure {
 
-    private String steeringAssistant;
-    private String breakAssistant;
-    private String abs;
-    private String tractionControl;
-    private String ersMission;
-    private String drsMission;
+    private final String steeringAssistant;
+    private final String breakAssistant;
+    private final String abs;
+    private final String tractionControl;
+    private final String ersMission;
+    private final String drsMission;
 
     public Settings (JSONObject settings) {
         this.steeringAssistant = (String) settings.get("steeringAssistant");
@@ -24,49 +24,24 @@ public class Settings {
         return steeringAssistant;
     }
 
-    public void setSteeringAssistant(String steeringAssistant) {
-        this.steeringAssistant = steeringAssistant;
-    }
-
     public String getBreakAssistant() {
         return breakAssistant;
-    }
-
-    public void setBreakAssistant(String breakAssistant) {
-        this.breakAssistant = breakAssistant;
     }
 
     public String getAbs() {
         return abs;
     }
 
-    public void setAbs(String abs) {
-        this.abs = abs;
-    }
-
     public String getTractionControl() {
         return tractionControl;
-    }
-
-    public void setTractionControl(String tractionControl) {
-        this.tractionControl = tractionControl;
     }
 
     public String getErsMission() {
         return ersMission;
     }
 
-    public void setErsMission(String ersMission) {
-        this.ersMission = ersMission;
-    }
-
     public String getDrsMission() {
         return drsMission;
     }
-
-    public void setDrsMission(String drsMission) {
-        this.drsMission = drsMission;
-    }
-
 
 }

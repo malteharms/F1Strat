@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class HelloApplication extends Application {
     @Override
@@ -26,6 +27,8 @@ public class HelloApplication extends Application {
         // read file and parse it to object
         JsonHandler jsonHandler = new JsonHandler();
         DataInstance data = jsonHandler.loadData(location);
+
+        System.out.println(Arrays.toString(data.dry.tracks.bahrain.trackData.hundred.soft.getLapTime())); // out > [18,24]
 
     }
 }

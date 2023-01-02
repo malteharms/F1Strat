@@ -5,29 +5,25 @@ import org.json.simple.JSONObject;
 
 public class DataInstance {
 
-    private JSONObject rawData;
-
-    private Condition dry;
-    private Condition wet;
+    public Condition dry;
+    public Condition wet;
 
 
     public DataInstance(JSONObject data) {
-        this.rawData = data;
-        build();
+        build(data);
     }
 
-    private void build () {
+    private void build (JSONObject data) {
         // error handling
-        if (rawData == null || rawData.size() < 1)
+        if (data == null || data.size() < 1)
              System.err.println("No data available .. check your json file");
 
         // build data tree
-        if (rawData.containsKey("dry"))
-            dry = new Condition((JSONObject) rawData.get("dry"));
-        if (rawData.containsKey("wet"))
-            wet = new Condition((JSONObject) rawData.get("wet"));
+        if (data.containsKey("dry"))
+            dry = new Condition((JSONObject) data.get("dry"));
+        if (data.containsKey("wet"))
+            wet = new Condition((JSONObject) data.get("wet"));
 
 
     }
-
 }
