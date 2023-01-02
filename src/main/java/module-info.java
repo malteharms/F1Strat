@@ -7,10 +7,8 @@ module de.malte.f1strat {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
-    requires com.google.gson;
+    requires json.simple;
 
     opens de.malte.f1strat to javafx.fxml;
     exports de.malte.f1strat;
-    exports de.malte.f1strat.structure;
-    opens de.malte.f1strat.structure to javafx.fxml;
 }

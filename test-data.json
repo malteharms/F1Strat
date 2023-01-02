@@ -1,0 +1,12 @@
+{
+    "dryCondition": {
+        "settings": {
+            "steeringAssistant": "off",
+            "breakAssistant": "off",
+            "abs": "on",
+            "tractionControl": "medium",
+            "ersMission": "medium",
+            "drsMission": "nie"
+        }
+    }
+}

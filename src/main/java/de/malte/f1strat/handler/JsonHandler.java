@@ -1,27 +1,54 @@
 package de.malte.f1strat.handler;
 
-import de.malte.f1strat.structure.DataStructure;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 
-import com.google.gson.Gson;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class JsonHandler {
 
-    public DataStructure loadData(String file) {
-        DataStructure data;
+    public JSONObject loadData(String file) {
+        Object obj;
+        JSONParser jsonParser = new JSONParser();
 
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            data = new Gson().fromJson(br, DataStructure.class);
+        try (FileReader reader = new FileReader(file)) {
+            //Read JSON file
+            obj = jsonParser.parse(reader);
 
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            JSONObject data = (JSONObject) obj;
+            System.out.println(data);
+
+            //Iterate over employee array
+            //data.forEach( emp -> parseEmployeeObject( (JSONObject) emp ) );
+
+            return data;
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
         }
 
-        return data;
+    return null;
+    }
+
+    private void parseEmployeeObject(JSONObject employee)
+    {
+        //Get employee object within list
+        JSONObject employeeObject = (JSONObject) employee.get("employee");
+
+        //Get employee first name
+        String firstName = (String) employeeObject.get("firstName");
+        System.out.println(firstName);
+
+        //Get employee last name
+        String lastName = (String) employeeObject.get("lastName");
+        System.out.println(lastName);
+
+        //Get employee website name
+        String website = (String) employeeObject.get("website");
+        System.out.println(website);
     }
 
 }

@@ -21,7 +21,7 @@ public class HelloApplication extends Application {
     public static void main(String[] args) {
         //launch();
 
-        String location = "f1-data.json";
+        String location = "test-data.json";
 
         JsonHandler jsonHandler = new JsonHandler();
         jsonHandler.loadData(location);
