@@ -9,11 +9,13 @@ public class TrackData extends Structure {
 
     public TrackData(JSONObject trackData) {
 
-        if (trackData.containsKey("twentyFifty"))
-            twentyFifty = new Distance((JSONObject) trackData.get("twentyFifty"));
+        String TWENTYFIFTY = "twentyFifty";
+        if (trackData.containsKey(TWENTYFIFTY))
+            twentyFifty = new Distance((JSONObject) trackData.get(TWENTYFIFTY));
 
-        if (trackData.containsKey("hundred"))
-            hundred = new Distance((JSONObject) trackData.get("hundred"));
+        String HUNDRED = "hundred";
+        if (trackData.containsKey(HUNDRED))
+            hundred = new Distance((JSONObject) trackData.get(HUNDRED));
 
     }
 }

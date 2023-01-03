@@ -15,14 +15,17 @@ public class Distance extends Structure {
         fuelLoad = (double) distance.get("fuelLoad");
         laps = (long) distance.get("laps");
 
-        if (distance.containsKey("soft"))
-            soft = new Compound((JSONObject) distance.get("soft"));
+        String SOFT = "soft";
+        if (distance.containsKey(SOFT))
+            soft = new Compound((JSONObject) distance.get(SOFT));
 
-        if (distance.containsKey("medium"))
-            medium = new Compound((JSONObject) distance.get("medium"));
+        String MEDIUM = "medium";
+        if (distance.containsKey(MEDIUM))
+            medium = new Compound((JSONObject) distance.get(MEDIUM));
 
-        if (distance.containsKey("hard"))
-            hard = new Compound((JSONObject) distance.get("hard"));
+        String HARD = "hard";
+        if (distance.containsKey(HARD))
+            hard = new Compound((JSONObject) distance.get(HARD));
     }
 
     public double getFuelLoad() {

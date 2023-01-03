@@ -12,11 +12,13 @@ public class Track extends Structure {
 
         this.stopTime = (double) track.get("stopTime");
 
-        if (track.containsKey("setup"))
-            setup = new Setup((JSONObject) track.get("setup"));
+        String SETUP = "setup";
+        if (track.containsKey(SETUP))
+            setup = new Setup((JSONObject) track.get(SETUP));
 
-        if (track.containsKey("trackData"))
-            trackData = new TrackData((JSONObject) track.get("trackData"));
+        String TRACKDATA = "trackData";
+        if (track.containsKey(TRACKDATA))
+            trackData = new TrackData((JSONObject) track.get(TRACKDATA));
 
     }
 
