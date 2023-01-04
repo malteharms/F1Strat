@@ -21,9 +21,9 @@
                     "tyres": [23.0, 23.0, 21.0, 21.0]
                 },
                 "trackData": {
-                    "twentyFifty": {
+                    "fifty": {
                         "fuelLoad": 53.0,
-                        "laps": 14,
+                        "laps": 29,
                         "soft": {
                             "perLap": 7,
                             "max": 11,
@@ -42,7 +42,7 @@
                                 "1:33.474",
                                 "1:34.185",
                                 "1:34.623",
-                                "1.36.122"
+                                "1:36.122"
                             ]
                         },
                         "medium": {
@@ -124,7 +124,7 @@
                     "tyres": [23.0, 23.0, 21.0, 21.0]
                 },
                 "trackData": {
-                    "twentyFifty": {
+                    "fifty": {
                         "fuelLoad": 52.0,
                         "laps": 25,
                         "soft": {
@@ -173,7 +173,7 @@
                                 "1:35.893"
                             ]
                         },
-                        "hart": {
+                        "hard": {
                             "perLap": 0,
                             "max": 0,
                             "ten": "",

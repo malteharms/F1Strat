@@ -4,14 +4,14 @@ import org.json.simple.JSONObject;
 
 public class TrackData extends Structure {
 
-    public Distance twentyFifty;
+    public Distance fifty;
     public Distance hundred;
 
     public TrackData(JSONObject trackData) {
 
-        String TWENTYFIFTY = "twentyFifty";
-        if (trackData.containsKey(TWENTYFIFTY))
-            twentyFifty = new Distance((JSONObject) trackData.get(TWENTYFIFTY));
+        String FIFTY = "fifty";
+        if (trackData.containsKey(FIFTY))
+            fifty = new Distance((JSONObject) trackData.get(FIFTY));
 
         String HUNDRED = "hundred";
         if (trackData.containsKey(HUNDRED))

@@ -9,7 +9,6 @@ public class DataInstance extends Structure {
     public Condition dry;
     public Condition wet;
 
-
     public DataInstance(JSONObject data) {
         build(data);
     }

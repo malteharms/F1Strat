@@ -1,0 +1,4 @@
+- Python AutoGui kann ein Screenshot vom LiveGame aufnehmen,
+  die aktuellen Daten auslesen und die Daten an das Java Programm schicken.
+  Anschließend kann anhand dieser Daten eine neue, aktuelle Strategie entwickelt werden
+

@@ -26,4 +26,24 @@ public class Track extends Structure {
         return stopTime;
     }
 
+    public boolean containsData() {
+
+        if (stopTime > 0)
+            return true;
+        return false;
+
+    }
+
+    private boolean isSetupComplete () {
+        if (setup.getAerodynamics().length == 2 &&
+            setup.getTransmission().length == 2 &&
+            setup.getSuspensionGeometry().length == 4 &&
+            setup.getSuspension().length == 6 &&
+            setup.getBreaks().length == 2 &&
+            setup.getTyres().length == 4 &&
+            setup.getTeam() != null)
+            return true;
+        return false;
+    }
+
 }
