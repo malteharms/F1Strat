@@ -36,6 +36,10 @@ public class Distance extends Structure {
         return laps;
     }
 
-
+    public boolean containsData() {
+        if (laps != 0 && soft != null && medium != null && hard != null)
+            return true;
+        return false;
+    }
 
 }

@@ -29,8 +29,7 @@ public class StartApplication extends Application {
         JsonHandler jsonHandler = new JsonHandler();
         DataInstance data = jsonHandler.loadData(location);
 
-        TyreStrategy soft = new TyreStrategy(data.dry.tracks.bahrain);
-        soft.calculateFastestStrategy50();
+        TyreStrategy bahrainStrategy = new TyreStrategy(data.dry.tracks.bahrain.trackData.fifty);
 
     }
 }
