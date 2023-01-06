@@ -42,4 +42,6 @@ public class Distance extends Structure {
         return false;
     }
 
+
+
 }

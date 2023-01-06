@@ -18,8 +18,6 @@ public class StartApplication extends Application {
         StartController controller = fxmlLoader.getController();
         Scene scene = new Scene(root);
 
-        controller.fillWithData();
-
         stage.setScene(scene);
         stage.show();
     }
