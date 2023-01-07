@@ -3,9 +3,12 @@ package de.malte.f1strat;
 import de.malte.f1strat.handler.JsonHandler;
 import de.malte.f1strat.helper.Converter;
 import de.malte.f1strat.structure.*;
+
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 
 import java.util.HashMap;
@@ -13,26 +16,31 @@ import java.util.Map;
 
 public class StartController {
 
-    final int LINE_CHART_MARGIN = 1;
+    final double LINE_CHART_MARGIN_TOP = 0.6;
+    final double LINE_CHART_MARGIN_RIGHT = 0.2;
+    final double LINE_CHART_MARGIN_BOTTOM = 0.1;
+
 
     int xMin = 0;
     int xMax = Integer.MIN_VALUE;
-    int yMin = Integer.MAX_VALUE;
-    int yMax = Integer.MIN_VALUE;
+    double yMin = Double.MAX_VALUE;
+    double yMax = Double.MIN_VALUE;
 
-    final String LINECHART_TITLE = "Rundenzeiten pro Reifenmischung";
+    final String LINE_CHART_TITLE = "Rundenzeiten pro Reifenmischung";
     final String SOFT = "Soft";
     final String MEDIUM = "Medium";
     final String HARD = "Hart";
 
     final String locationOfData = "f1-data.json";
-
     DataInstance data = new JsonHandler().loadData(locationOfData);
 
     @FXML
     public ChoiceBox<String> cbDistance;
     public ChoiceBox<String> cbTrack;
     public ChoiceBox<String> cbCondition;
+    public CheckBox cbSoft;
+    public CheckBox cbMedium;
+    public CheckBox cbHard;
 
     @FXML
     private Button loadData;
@@ -44,62 +52,109 @@ public class StartController {
 
     @FXML
     public void initialize() {
+
+        loadDataListener();
+        cbSoftListener();
+        cbMediumListener();
+        cbHardListener();
+
+    }
+
+
+    private void cbHardListener() {
+        cbHard.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            Distance neededData = getNeededData();
+            ObservableValue<Boolean> ov = (ObservableValue<Boolean>) observable;
+            Boolean isChecked = ov.getValue();
+
+            if (isChecked) {
+                addLineToLineChart(getLapTimeMap(neededData.hard), HARD);
+            } else {
+                lcLapTimes.getData().clear();
+                if (cbSoft.selectedProperty().getValue())
+                    addLineToLineChart(getLapTimeMap(neededData.soft), SOFT);
+                if (cbMedium.selectedProperty().getValue())
+                    addLineToLineChart(getLapTimeMap(neededData.medium), MEDIUM);
+            }
+        });
+    }
+
+    private void cbMediumListener() {
+        cbMedium.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            Distance neededData = getNeededData();
+            ObservableValue<Boolean> ov = (ObservableValue<Boolean>) observable;
+            Boolean isChecked = ov.getValue();
+
+            if (isChecked) {
+                addLineToLineChart(getLapTimeMap(neededData.medium), MEDIUM);
+            } else {
+                lcLapTimes.getData().clear();
+                if (cbSoft.selectedProperty().getValue())
+                    addLineToLineChart(getLapTimeMap(neededData.soft), SOFT);
+                if (cbHard.selectedProperty().getValue())
+                    addLineToLineChart(getLapTimeMap(neededData.hard), HARD);
+            }
+        });
+    }
+
+    private void cbSoftListener() {
+        cbSoft.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            Distance neededData = getNeededData();
+            ObservableValue<Boolean> ov = (ObservableValue<Boolean>) observable;
+            Boolean isChecked = ov.getValue();
+
+            if (isChecked) {
+                addLineToLineChart(getLapTimeMap(neededData.soft), SOFT);
+            } else {
+                lcLapTimes.getData().clear();
+                if (cbMedium.selectedProperty().getValue())
+                    addLineToLineChart(getLapTimeMap(neededData.medium), MEDIUM);
+                if (cbHard.selectedProperty().getValue())
+                    addLineToLineChart(getLapTimeMap(neededData.hard), HARD);
+            }
+        });
+    }
+
+    private void loadDataListener() {
         loadData.setOnAction(actionEvent -> {
 
             lcLapTimes.getData().clear();
-
-            String distance = cbDistance.getValue();
-            String track = cbTrack.getValue();
-            String condition = cbCondition.getValue();
-
-            Distance neededData = getDistanceObject(data, distance, track, condition);
-            setLineChart(getLapTimeMap(neededData.soft),
-                    getLapTimeMap(neededData.medium), getLapTimeMap(neededData.hard));
-
+            lcLapTimes.setTitle(LINE_CHART_TITLE);
 
             xAxis.setAutoRanging(false);
             yAxis.setAutoRanging(false);
 
+            Distance neededData = getNeededData();
+
+            addLineToLineChart(getLapTimeMap(neededData.soft), SOFT);
+            addLineToLineChart(getLapTimeMap(neededData.medium), MEDIUM);
+            addLineToLineChart(getLapTimeMap(neededData.hard), HARD);
+
             xAxis.setLowerBound( xMin );
-            xAxis.setUpperBound( xMax + LINE_CHART_MARGIN );
-            yAxis.setLowerBound( yMin - LINE_CHART_MARGIN );
-            yAxis.setUpperBound( yMax + LINE_CHART_MARGIN );
+            xAxis.setUpperBound( xMax + LINE_CHART_MARGIN_RIGHT);
+            yAxis.setLowerBound( yMin );
+            yAxis.setUpperBound( yMax + LINE_CHART_MARGIN_TOP );
 
         });
     }
 
 
-    private void setLineChart(Map<Integer, Double> s, Map<Integer, Double> m, Map<Integer, Double> h) {
-        XYChart.Series<Number, Number> soft = new XYChart.Series<>();
-        XYChart.Series<Number, Number> medium = new XYChart.Series<>();
-        XYChart.Series<Number, Number> hard = new XYChart.Series<>();
+    private Distance getNeededData() {
+        String distance = cbDistance.getValue();
+        String track = cbTrack.getValue();
+        String condition = cbCondition.getValue();
 
-        lcLapTimes.getXAxis().setAutoRanging(false);
-        lcLapTimes.getYAxis().setAutoRanging(false);
+        return getDistanceObject(data, distance, track, condition);
+    }
 
-        lcLapTimes.setTitle(LINECHART_TITLE);
-        soft.setName(SOFT);
-        medium.setName(MEDIUM);
-        hard.setName(HARD);
 
-        // get soft lap time data
-        for (int i = 0; i < s.size(); i++)
-            soft.getData().add(new XYChart.Data<>(i + 1, s.get(i + 1)));
+    private void addLineToLineChart(Map<Integer, Double> data, String nameInChart) {
+        XYChart.Series<Number, Number> line = new XYChart.Series<>();
+        line.setName(nameInChart);
 
-        lcLapTimes.getData().add(soft);
-
-        // get medium lap time data
-        for (int i = 0; i < m.size(); i++)
-            medium.getData().add(new XYChart.Data<>( i + 1, m.get(i + 1)));
-        lcLapTimes.getData().add(medium);
-
-        // get hard lap time data
-        for (int i = 0; i < h.size(); i++)
-            hard.getData().add(new XYChart.Data<>( i + 1, h.get(i + 1)));
-        lcLapTimes.getData().add(hard);
-
-        System.out.println("XMAX: " + xMax + "\tYMAX: " + yMax + "\tYMIN: " + yMin);
-
+        for (int i = 0; i < data.size(); i++)
+            line.getData().add(new XYChart.Data<>(i + 1, data.get(i + 1)));
+        lcLapTimes.getData().add(line);
     }
 
 
@@ -118,6 +173,7 @@ public class StartController {
 
             if (x + 1 > xMax)
                 xMax = x + 1;
+
         }
 
         return res;
