@@ -3,6 +3,7 @@ package de.malte.f1strat.logic;
 import de.malte.f1strat.helper.Converter;
 import de.malte.f1strat.structure.Compound;
 import de.malte.f1strat.structure.Distance;
+import de.malte.f1strat.structure.Track;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -23,18 +24,20 @@ public class TyreStrategy {
     final String HARD = "Hard";
 
     Distance track;
+    Track stopTime;
     List<String> tireTypes;
     Map<String, Integer> tireCounts;
     List<List<String>> tireOrders;
     Map<Map<Integer, String>, Double> tireOrderWithTrackTime;
 
 
-    public TyreStrategy(Distance track) {
+    public TyreStrategy(Distance track, Track stopTime) {
 
         // check if tyre data is available
-        if (track.containsData())
+        if (track.containsData()) {
             this.track = track;
-        else {
+            this.stopTime = stopTime;
+        }else {
             System.err.println(TyreStrategy.class.getName() + ": There is no data in this Object.");
             return;
         }
@@ -68,33 +71,11 @@ public class TyreStrategy {
 
         for (List<String> tireOrder : tireOrders) {
 
-            if (tireOrder.size() == 2) {
-                Compound c1 = getCompound(tireOrder.get(0));
-                Compound c2 = getCompound(tireOrder.get(1));
-                double fastestTime = Double.MAX_VALUE;
-                int curIn1 = 1;
-                int curIn2 = 2;
-                Map<Integer, String> tireWithInLap = new HashMap<Integer, String>();
-
-                for (int in1 = 1; in1 < c1.getMax() - 1; in1++) {
-                    for (int in2 = in1 + 1; in2 < c2.getMax(); in2++) {
-                        if (in1 + c2.getMax() >= track.getLaps()) {
-                            double cur = c1.getTrackTimes()[in1] + c2.getTrackTimes()[in2];
-                            if (fastestTime > cur) {
-                                fastestTime = cur;
-                                curIn1 = in1;
-                                curIn2 = in2;
-                            }
-                        }
-                    }
-                }
-                if (fastestTime != Double.MAX_VALUE) {
-                    tireWithInLap.put(curIn1, tireOrder.get(0));
-                    tireWithInLap.put(curIn2, tireOrder.get(1));
-
-                    tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
-                }
-
+            switch (tireOrder.size()) {
+                case 2 -> fastestStrategyTwoCompounds(tireOrder);
+                case 3 -> fastestStrategyThreeCompounds(tireOrder);
+                case 4 -> fastestStrategyFourCompounds(tireOrder);
+                case 5 -> fastestStrategyFiveCompounds(tireOrder);
             }
         }
     }
@@ -135,32 +116,6 @@ public class TyreStrategy {
         return tireOrders;
     }
 
-    private String[] getSummedLapTimesSoft() {
-        String[] lapTimeSoft = track.soft.getLapTime();
-        String[] trackTimeSoft = new String[track.soft.getLapTime().length];
-        for (int age = 0; age < max(track.soft.getMax()); age++)
-            trackTimeSoft[age] = calculateLapTimes(lapTimeSoft, age);
-
-        return trackTimeSoft;
-    }
-
-    private String[] getSummedLapTimesMedium() {
-        String[] lapTimeMedium = track.medium.getLapTime();
-        String[] trackTimeMedium = new String[track.medium.getLapTime().length];
-        for (int age = 0; age < max(track.medium.getMax()); age++)
-            trackTimeMedium[age] = calculateLapTimes(lapTimeMedium, age);
-
-        return trackTimeMedium;
-    }
-
-    private String[] getSummedLapTimesHard() {
-        String[] lapTimeHard = track.hard.getLapTime();
-        String[] trackTimeHard = new String[track.hard.getLapTime().length];
-        for (int age = 0; age < max(track.hard.getMax()); age++)
-            trackTimeHard[age] = calculateLapTimes(lapTimeHard, age);
-
-        return trackTimeHard;
-    }
 
     private String calculateLapTimes(String[] lapTime, int age) {
         int min = 0, sec = 0, mil = 0;
@@ -225,4 +180,155 @@ public class TyreStrategy {
             tireOrders.remove(td);
     }
 
+    private void fastestStrategyTwoCompounds(List<String> tireOrder) {
+        Compound c1 = getCompound(tireOrder.get(0));
+        Compound c2 = getCompound(tireOrder.get(1));
+        double fastestTime = Double.MAX_VALUE;
+        int curIn1 = 1;
+        int curIn2 = 2;
+        Map<Integer, String> tireWithInLap = new HashMap<Integer, String>();
+
+        for (int in1 = 1; in1 < c1.getMax() - 1; in1++) {
+            for (int in2 = in1 + 1; in2 < c2.getMax(); in2++) {
+                if (in1 + c2.getMax() >= track.getLaps()) {
+                    double cur = c1.getTrackTimes()[in1] + c2.getTrackTimes()[in2] + (stopTime.getStopTime() * 1);
+                    if (fastestTime > cur) {
+                        fastestTime = cur;
+                        curIn1 = in1;
+                        curIn2 = in2;
+                    }
+                }
+            }
+        }
+        if (fastestTime != Double.MAX_VALUE) {
+            tireWithInLap.put(curIn1, tireOrder.get(0));
+            tireWithInLap.put(curIn2, tireOrder.get(1));
+
+            tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
+        }
+    }
+
+    private void fastestStrategyThreeCompounds(List<String> tireOrder) {
+        Compound c1 = getCompound(tireOrder.get(0));
+        Compound c2 = getCompound(tireOrder.get(1));
+        Compound c3 = getCompound(tireOrder.get(2));
+        double fastestTime = Double.MAX_VALUE;
+        int curIn1 = 1;
+        int curIn2 = 2;
+        int curIn3 = 3;
+        Map<Integer, String> tireWithInLap = new HashMap<Integer, String>();
+
+        for (int in1 = 1; in1 < c1.getMax() - 1; in1++) {
+            for (int in2 = in1 + 1; in2 < c2.getMax(); in2++) {
+                for (int in3 = in2 + 1; in3 < c3.getMax(); in3++) {
+                    if (in1 + in2 + c3.getMax() >= track.getLaps()) {
+                        double cur = c1.getTrackTimes()[in1] + c2.getTrackTimes()[in2] + c3.getTrackTimes()[in3]
+                                + (stopTime.getStopTime() * 2);
+                        if (fastestTime > cur) {
+                            fastestTime = cur;
+                            curIn1 = in1;
+                            curIn2 = in2;
+                            curIn3 = in3;
+                        }
+                    }
+                }
+            }
+        }
+        if (fastestTime != Double.MAX_VALUE) {
+            tireWithInLap.put(curIn1, tireOrder.get(0));
+            tireWithInLap.put(curIn2, tireOrder.get(1));
+            tireWithInLap.put(curIn3, tireOrder.get(2));
+
+            tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
+        }
+    }
+
+    private void fastestStrategyFourCompounds(List<String> tireOrder) {
+        Compound c1 = getCompound(tireOrder.get(0));
+        Compound c2 = getCompound(tireOrder.get(1));
+        Compound c3 = getCompound(tireOrder.get(2));
+        Compound c4 = getCompound(tireOrder.get(3));
+        double fastestTime = Double.MAX_VALUE;
+        int curIn1 = 1;
+        int curIn2 = 2;
+        int curIn3 = 3;
+        int curIn4 = 4;
+        Map<Integer, String> tireWithInLap = new HashMap<Integer, String>();
+
+        for (int in1 = 1; in1 < c1.getMax() - 1; in1++) {
+            for (int in2 = in1 + 1; in2 < c2.getMax(); in2++) {
+                for (int in3 = in2 + 1; in3 < c3.getMax(); in3++) {
+                    for (int in4 = in3 + 1; in4 < c4.getMax(); in4++) {
+                        if (in1 + in2 + c3.getMax() >= track.getLaps()) {
+                            double cur = c1.getTrackTimes()[in1] + c2.getTrackTimes()[in2] +
+                                    c3.getTrackTimes()[in3] + c4.getTrackTimes()[in4] + (stopTime.getStopTime() * 3);
+                            if (fastestTime > cur) {
+                                fastestTime = cur;
+                                curIn1 = in1;
+                                curIn2 = in2;
+                                curIn3 = in3;
+                                curIn4 = in4;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (fastestTime != Double.MAX_VALUE) {
+            tireWithInLap.put(curIn1, tireOrder.get(0));
+            tireWithInLap.put(curIn2, tireOrder.get(1));
+            tireWithInLap.put(curIn3, tireOrder.get(2));
+            tireWithInLap.put(curIn4, tireOrder.get(3));
+
+            tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
+        }
+    }
+
+    private void fastestStrategyFiveCompounds(List<String> tireOrder) {
+        Compound c1 = getCompound(tireOrder.get(0));
+        Compound c2 = getCompound(tireOrder.get(1));
+        Compound c3 = getCompound(tireOrder.get(2));
+        Compound c4 = getCompound(tireOrder.get(3));
+        Compound c5 = getCompound(tireOrder.get(4));
+        double fastestTime = Double.MAX_VALUE;
+        int curIn1 = 1;
+        int curIn2 = 2;
+        int curIn3 = 3;
+        int curIn4 = 4;
+        int curIn5 = 5;
+        Map<Integer, String> tireWithInLap = new HashMap<Integer, String>();
+
+        for (int in1 = 1; in1 < c1.getMax() - 1; in1++) {
+            for (int in2 = in1 + 1; in2 < c2.getMax(); in2++) {
+                for (int in3 = in2 + 1; in3 < c3.getMax(); in3++) {
+                    for (int in4 = in3 + 1; in4 < c4.getMax(); in4++) {
+                        for (int in5 = in4 + 1; in5 < c5.getMax(); in5++) {
+                            if (in1 + in2 + c3.getMax() >= track.getLaps()) {
+                                double cur = c1.getTrackTimes()[in1] + c2.getTrackTimes()[in2] +
+                                        c3.getTrackTimes()[in3] + c4.getTrackTimes()[in4] + c5.getTrackTimes()[in5]
+                                        + (stopTime.getStopTime() * 4);
+                                if (fastestTime > cur) {
+                                    fastestTime = cur;
+                                    curIn1 = in1;
+                                    curIn2 = in2;
+                                    curIn3 = in3;
+                                    curIn4 = in4;
+                                    curIn5 = in5;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (fastestTime != Double.MAX_VALUE) {
+            tireWithInLap.put(curIn1, tireOrder.get(0));
+            tireWithInLap.put(curIn2, tireOrder.get(1));
+            tireWithInLap.put(curIn3, tireOrder.get(2));
+            tireWithInLap.put(curIn4, tireOrder.get(3));
+            tireWithInLap.put(curIn5, tireOrder.get(4));
+
+            tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
+        }
+    }
 }

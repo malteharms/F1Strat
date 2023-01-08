@@ -18,9 +18,6 @@ public class StartController {
 
     final double LINE_CHART_MARGIN_TOP = 0.6;
     final double LINE_CHART_MARGIN_RIGHT = 0.2;
-    final double LINE_CHART_MARGIN_BOTTOM = 0.1;
-
-
     int xMin = 0;
     int xMax = Integer.MIN_VALUE;
     double yMin = Double.MAX_VALUE;
@@ -46,9 +43,12 @@ public class StartController {
     private Button loadData;
 
     @FXML
-    private LineChart<Number, Number> lcLapTimes;
+    public LineChart<Number, Number> lcLapTimes;
+    public LineChart<Number, Number> lcStrategy;
     public NumberAxis xAxis;
     public NumberAxis yAxis;
+    public NumberAxis strXAxis;
+    public NumberAxis strYAxis;
 
     @FXML
     public void initialize() {
@@ -181,103 +181,47 @@ public class StartController {
 
 
     private Distance getDistanceObject(DataInstance data, String distance, String track, String condition) {
-        switch (condition) {
-            case "Trocken":
-                TrackData onDry = switchTrack(data.dry.tracks, track);
-                switch (distance) {
-                    case "100%":
-                        return onDry.hundred;
-                    default:
-                        return onDry.fifty;
-                }
-
-            default:
-                TrackData onWet = switchTrack(data.wet.tracks, track);
-                switch (distance) {
-                    case "100%":
-                        return onWet.hundred;
-                    default:
-                        return onWet.fifty;
-                }
+        if (condition.equals("Trocken")) {
+            TrackData onDry = switchTrack(data.dry.tracks, track);
+            if (distance.equals("100%")) {
+                return onDry.hundred;
+            }
+            return onDry.fifty;
         }
+        TrackData onWet = switchTrack(data.wet.tracks, track);
+        if (distance.equals("100%")) {
+            return onWet.hundred;
+        }
+        return onWet.fifty;
     }
 
     private TrackData switchTrack(Tracks data, String track) {
-        Track whichTrack;
-
-        switch (track) {
-            case "Bahrain":
-                whichTrack = data.bahrain;
-                break;
-            case "Jeddah":
-                whichTrack = data.jeddah;
-                break;
-            case "Australien":
-                whichTrack = data.australia;
-                break;
-            case "Imola":
-                whichTrack = data.imola;
-                break;
-            case "Miami":
-                whichTrack = data.miami;
-                break;
-            case "Spanien":
-                whichTrack = data.spain;
-                break;
-            case "Monaco":
-                whichTrack = data.monaco;
-                break;
-            case "Baku":
-                whichTrack = data.baku;
-                break;
-            case "Kanada":
-                whichTrack = data.canada;
-                break;
-            case "Silverstone":
-                whichTrack = data.silverstone;
-                break;
-            case "Österreich":
-                whichTrack = data.austria;
-                break;
-            case "Frankreich":
-                whichTrack = data.france;
-                break;
-            case "Ungarn":
-                whichTrack = data.hungary;
-                break;
-            case "Belgien":
-                whichTrack = data.spa;
-                break;
-            case "Niederlande":
-                whichTrack = data.dutch;
-                break;
-            case "Monza":
-                whichTrack = data.monza;
-                break;
-            case "Singapur":
-                whichTrack = data.singapore;
-                break;
-            case "Japan":
-                whichTrack = data.japan;
-                break;
-            case "USA":
-                whichTrack = data.usa;
-                break;
-            case "Mexiko":
-                whichTrack = data.mexico;
-                break;
-            case "Brasilien":
-                whichTrack = data.brazil;
-                break;
-            case "Abu Dhabi":
-                whichTrack = data.abudhabi;
-                break;
-            case "China":
-                whichTrack = data.china;
-                break;
-            default:
-                whichTrack = data.portuguese;
-        }
+        Track whichTrack = switch (track) {
+            case "Bahrain" -> data.bahrain;
+            case "Jeddah" -> data.jeddah;
+            case "Australien" -> data.australia;
+            case "Imola" -> data.imola;
+            case "Miami" -> data.miami;
+            case "Spanien" -> data.spain;
+            case "Monaco" -> data.monaco;
+            case "Baku" -> data.baku;
+            case "Kanada" -> data.canada;
+            case "Silverstone" -> data.silverstone;
+            case "Österreich" -> data.austria;
+            case "Frankreich" -> data.france;
+            case "Ungarn" -> data.hungary;
+            case "Belgien" -> data.spa;
+            case "Niederlande" -> data.dutch;
+            case "Monza" -> data.monza;
+            case "Singapur" -> data.singapore;
+            case "Japan" -> data.japan;
+            case "USA" -> data.usa;
+            case "Mexiko" -> data.mexico;
+            case "Brasilien" -> data.brazil;
+            case "Abu Dhabi" -> data.abudhabi;
+            case "China" -> data.china;
+            default -> data.portuguese;
+        };
 
         return whichTrack.trackData;
     }

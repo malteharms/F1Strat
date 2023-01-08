@@ -25,12 +25,6 @@ public class StartApplication extends Application {
     }
 
     public static void main(String[] args) {
-        //launch(args);
-
-        JsonHandler jsonHandler = new JsonHandler();
-        DataInstance di = jsonHandler.loadData("f1-data.json");
-        TyreStrategy ts = new TyreStrategy(di.dry.tracks.bahrain.trackData.fifty);
-
-        System.out.println(ts.getTireOrderWithTrackTime());
+        launch(args);
     }
 }
