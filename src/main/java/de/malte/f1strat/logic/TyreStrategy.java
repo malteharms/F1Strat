@@ -1,5 +1,7 @@
 package de.malte.f1strat.logic;
 
+import de.malte.f1strat.helper.Converter;
+import de.malte.f1strat.structure.Compound;
 import de.malte.f1strat.structure.Distance;
 
 import java.util.List;
@@ -24,6 +26,7 @@ public class TyreStrategy {
     List<String> tireTypes;
     Map<String, Integer> tireCounts;
     List<List<String>> tireOrders;
+    Map<Map<Integer, String>, Double> tireOrderWithTrackTime;
 
 
     public TyreStrategy(Distance track) {
@@ -45,6 +48,8 @@ public class TyreStrategy {
         tireCounts.put(MEDIUM, AMOUNT_MEDIUM);
         tireCounts.put(HARD, AMOUNT_HARD);
 
+        tireOrderWithTrackTime = new HashMap<Map<Integer, String>, Double>();
+
         // generate tyre orders
         for (int i = 0; i < MAX_STOPS - 1; i++) {
             List<List<String>> cur = generateTireOrders(MAX_STOPS - i, tireTypes, tireCounts);
@@ -56,7 +61,54 @@ public class TyreStrategy {
 
         // every tyre order has multiple possibilities for in-laps
         // next step is to look which possibility is the fastest for each tyre order
+        calculateFastestStrategy();
+    }
 
+    private void calculateFastestStrategy() {
+
+        for (List<String> tireOrder : tireOrders) {
+
+            if (tireOrder.size() == 2) {
+                Compound c1 = getCompound(tireOrder.get(0));
+                Compound c2 = getCompound(tireOrder.get(1));
+                double fastestTime = Double.MAX_VALUE;
+                int curIn1 = 1;
+                int curIn2 = 2;
+                Map<Integer, String> tireWithInLap = new HashMap<Integer, String>();
+
+                for (int in1 = 1; in1 < c1.getMax() - 1; in1++) {
+                    for (int in2 = in1 + 1; in2 < c2.getMax(); in2++) {
+                        if (in1 + c2.getMax() >= track.getLaps()) {
+                            double cur = c1.getTrackTimes()[in1] + c2.getTrackTimes()[in2];
+                            if (fastestTime > cur) {
+                                fastestTime = cur;
+                                curIn1 = in1;
+                                curIn2 = in2;
+                            }
+                        }
+                    }
+                }
+                if (fastestTime != Double.MAX_VALUE) {
+                    tireWithInLap.put(curIn1, tireOrder.get(0));
+                    tireWithInLap.put(curIn2, tireOrder.get(1));
+
+                    tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
+                }
+
+            }
+        }
+    }
+
+    public Map<Map<Integer, String>, Double> getTireOrderWithTrackTime() {
+        return tireOrderWithTrackTime;
+    }
+
+    private Compound getCompound(String s) {
+        return switch (s) {
+            case SOFT -> track.soft;
+            case MEDIUM -> track.medium;
+            default -> track.hard;
+        };
     }
 
     private List<List<String>> generateTireOrders(int numLaps, List<String> tireTypes, Map<String, Integer> tireCounts) {

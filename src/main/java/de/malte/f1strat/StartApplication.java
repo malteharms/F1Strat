@@ -1,5 +1,7 @@
 package de.malte.f1strat;
 
+import de.malte.f1strat.handler.JsonHandler;
+import de.malte.f1strat.logic.TyreStrategy;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,6 +25,12 @@ public class StartApplication extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        //launch(args);
+
+        JsonHandler jsonHandler = new JsonHandler();
+        DataInstance di = jsonHandler.loadData("f1-data.json");
+        TyreStrategy ts = new TyreStrategy(di.dry.tracks.bahrain.trackData.fifty);
+
+        System.out.println(ts.getTireOrderWithTrackTime());
     }
 }

@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 public class Distance extends Structure {
 
     private final double fuelLoad;
-    private final long laps;
+    private final int laps;
     public Compound soft;
     public Compound medium;
     public Compound hard;
@@ -13,7 +13,8 @@ public class Distance extends Structure {
     public Distance(JSONObject distance) {
 
         fuelLoad = (double) distance.get("fuelLoad");
-        laps = (long) distance.get("laps");
+        long l = (long) distance.get("laps");
+        laps = (int) l;
 
         String SOFT = "soft";
         if (distance.containsKey(SOFT))
@@ -32,7 +33,7 @@ public class Distance extends Structure {
         return fuelLoad;
     }
 
-    public long getLaps() {
+    public int getLaps() {
         return laps;
     }
 

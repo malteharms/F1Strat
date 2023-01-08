@@ -1,12 +1,13 @@
 package de.malte.f1strat.structure;
 
+import de.malte.f1strat.helper.Converter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class Compound extends Structure {
 
-    private final long perLap;
-    private final long max;
+    private final int perLap;
+    private final int max;
     private final String ten;
     private final String thirty;
     private final String sixty;
@@ -15,8 +16,12 @@ public class Compound extends Structure {
 
     public Compound(JSONObject compound) {
 
-        this.perLap = (long) compound.get("perLap");
-        this.max = (long) compound.get("max");
+        long pl = (long) compound.get("perLap");
+        this.perLap = (int) pl;
+
+        long m = (long) compound.get("max");
+        max = (int) m;
+
         this.ten = (String) compound.get("ten");
         this.thirty = (String) compound.get("thirty");
         this.sixty = (String) compound.get("eighty");
@@ -26,11 +31,11 @@ public class Compound extends Structure {
         this.lapTime = objectArrToStringArr(ltm.toArray());
     }
 
-    public long getPerLap() {
+    public int getPerLap() {
         return perLap;
     }
 
-    public long getMax() {
+    public int getMax() {
         return max;
     }
 
@@ -52,5 +57,15 @@ public class Compound extends Structure {
 
     public String[] getLapTime() {
         return lapTime;
+    }
+
+    public Double[] getTrackTimes() {
+        Double[] res = new Double[lapTime.length];
+        double summed = 0.0;
+        for (int i = 0; i < lapTime.length; i++) {
+            summed += Converter.lapTimeStringToDouble(getLapTime()[i]);
+            res[i] = summed;
+        }
+        return res;
     }
 }
