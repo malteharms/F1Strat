@@ -211,6 +211,7 @@ public class TyreStrategy {
             if (inLapCnt[inLapCnt.length - 1] > compounds[compounds.length - 1].getMax()) {
                 // tbd
             }
+            break;
         }
 
         if (fastestTime < Double.MAX_VALUE) {
