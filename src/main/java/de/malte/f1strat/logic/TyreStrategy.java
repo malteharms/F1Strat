@@ -1,6 +1,6 @@
 package de.malte.f1strat.logic;
 
-import de.malte.f1strat.helper.Converter;
+import de.malte.f1strat.helper.ArrayHelper;
 import de.malte.f1strat.structure.Compound;
 import de.malte.f1strat.structure.Distance;
 import de.malte.f1strat.structure.Track;
@@ -180,6 +180,60 @@ public class TyreStrategy {
             tireOrders.remove(td);
     }
 
+    public void computeFastestStrategy(List<String> tireOrder) {
+        Map<Integer, String> tireWithInLap = new HashMap<>();
+        Compound[] compounds = new Compound[tireOrder.size()];
+        int[] inLapCnt = new int[tireOrder.size()];
+        int[] currentFastestInLap = new int[tireOrder.size()];
+        double fastestTime = Double.MAX_VALUE;
+
+        for (int index = 0; index < tireOrder.size(); index++) {
+            compounds[index] = getCompound(tireOrder.get(index));
+            currentFastestInLap[index] = index + 1;
+            inLapCnt[index] = index + 1;
+        }
+
+        while(true) {
+            // does the distance can be solved
+            if (ArrayHelper.sumArray( ArrayHelper.clipArray(inLapCnt, 0, inLapCnt.length - 1) ) +
+                    compounds[compounds.length - 1].getMax() > stopTime.getStopTime()) {
+
+                double currentTrackTime = computeTrackTime(compounds, inLapCnt);
+                if (fastestTime > currentTrackTime) {
+                    fastestTime = currentTrackTime;
+                    System.arraycopy(inLapCnt, 0, currentFastestInLap, 0, currentFastestInLap.length);
+                }
+
+            }
+
+            // update inLapCnt to next position
+            inLapCnt[inLapCnt.length - 1]++;
+            if (inLapCnt[inLapCnt.length - 1] > compounds[compounds.length - 1].getMax()) {
+                // tbd
+            }
+        }
+
+        if (fastestTime < Double.MAX_VALUE) {
+            for (int index = 0; index < tireOrder.size(); index++)
+                tireWithInLap.put(currentFastestInLap[index], tireOrder.get(index));
+
+            tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
+        }
+
+    }
+
+
+    private double computeTrackTime(Compound[] compounds, int[] inLaps) {
+        double trackTime = 0.0;
+
+        for (int index = 0; index < compounds.length; index++)
+            trackTime += compounds[index].getTrackTimes()[inLaps[index]];
+
+        return trackTime;
+
+    }
+
+
     private void fastestStrategyTwoCompounds(List<String> tireOrder) {
         Compound c1 = getCompound(tireOrder.get(0));
         Compound c2 = getCompound(tireOrder.get(1));
@@ -331,4 +385,6 @@ public class TyreStrategy {
             tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
         }
     }
+
+
 }
