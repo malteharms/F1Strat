@@ -78,7 +78,11 @@ public class TyreStrategy {
                 case 5 -> fastestStrategyFiveCompounds(tireOrder);
             }
              */
-            computeFastestStrategy(tireOrder);
+            Map<Integer, String> fastestStrategy = computeFastestStrategy(tireOrder);
+            System.out.println("TireOrder: " + tireOrder);
+            System.out.println("fastest Strategy: " + fastestStrategy);
+            System.out.println("- - - - - - - - - - - -");
+
         }
     }
 
@@ -182,24 +186,40 @@ public class TyreStrategy {
             tireOrders.remove(td);
     }
 
-    public void computeFastestStrategy(List<String> tireOrder) {
+    public Map<Integer, String> computeFastestStrategy(List<String> tireOrder) {
+        // in lap with tyre type, the return value
+        // example: (1, medium) (5, soft)
         Map<Integer, String> tireWithInLap = new HashMap<>();
+
+        // the object for each tyre string
+        // example: (Compound medium, Compound soft)
         Compound[] compounds = new Compound[tireOrder.size()];
+
+        // an array which stores the current in lap order
+        // example: (1, 5)
         int[] inLapCnt = new int[tireOrder.size()];
+
+        // an array to store the fastest in lap order
+        // example: (1, 5)
         int[] currentFastestInLap = new int[tireOrder.size()];
+
+        // the fastest track time for an order
         double fastestTime = Double.MAX_VALUE;
 
+        // array setup
         for (int index = 0; index < tireOrder.size(); index++) {
             compounds[index] = getCompound(tireOrder.get(index));
             currentFastestInLap[index] = index + 1;
             inLapCnt[index] = index + 1;
         }
 
-        while(true) {
+        // analyse the tyre order for each in lap combination
+        boolean isFinished = false;
+        while(!isFinished) {
             // does the distance can be solved
-            if (ArrayHelper.sumArray( ArrayHelper.clipArray(inLapCnt, 0, inLapCnt.length - 1) ) +
-                    compounds[compounds.length - 1].getMax() > stopTime.getStopTime()) {
+            if (getCurrentDistanceForInLapOrder(inLapCnt, compounds) > track.getLaps() && isMakeable(inLapCnt, compounds)) {
 
+                // check, if the current track time is faster than the current fastest order
                 double currentTrackTime = computeTrackTime(compounds, inLapCnt);
                 if (fastestTime > currentTrackTime) {
                     fastestTime = currentTrackTime;
@@ -207,44 +227,113 @@ public class TyreStrategy {
                 }
 
             }
+            // update tyre with in lap
+            for (int index = 0; index < inLapCnt.length; index++)
+                tireWithInLap.put(inLapCnt[index], tireOrder.get(index));
 
-            // update inLapCnt to next position
-            inLapCnt[inLapCnt.length - 1]++;
-            if ( compounds[compounds.length - 2].getMax() <
-                    inLapCnt[inLapCnt.length - 1] - inLapCnt[inLapCnt.length - 2] ) {
+            // update inLapCnt
+            inLapCnt = updateInLapCnt(inLapCnt, compounds);
+            if (!hasMorePosibilities(inLapCnt))
+                isFinished = true;
+        }
 
-                int element = 2;
-                while (true) {
-                    inLapCnt[inLapCnt.length - element]++;
+        return tireWithInLap;
+    }
 
-                    // arrange previous element to available in lap
-                    inLapCnt[inLapCnt.length - element - 1] = inLapCnt[inLapCnt.length - element] + 1;
+    private boolean hasMorePosibilities(int[] inLapCnt) {
+        int lastElement = inLapCnt.length - 1;
+        for (int index = lastElement; index > 0; index--) {
+            if (inLapCnt[index] == inLapCnt[index - 1] + 1)
+                return true;
+        }
+        return false;
+    }
+
+
+    /*
+    max laps: 10
+    all can solve 4 laps
+
+    [1,2,6]
+    [1,2,7]
+    [1,2,8]
+    [1,2,9]
+    [1,3,4]
+    [1,3,5]
+    [1,3,6]
+    [1,3,7]
+    [1,3,8]
+
+     */
+    private int[] updateInLapCnt(int[] inLapCnt, Compound[] compounds) {  // [1,2] ; [medium, soft]
+        int lastElement = inLapCnt.length - 1;
+
+        if (inLapCnt[lastElement] >= track.getLaps() - 1) { //[1, 7, 8, 9]
+
+            for (int indexL = lastElement - 1; indexL > 0; indexL--) {
+                if (!(inLapCnt[indexL] == inLapCnt[indexL + 1] - 1)) {  // if not one element equals next element - 1
+                    inLapCnt[indexL]++;
+
+                    // set inLaps after to correct position
+                    for (int indexF = indexL + 1; indexF < inLapCnt.length; indexF++)
+                        inLapCnt[indexF] = inLapCnt[indexF-1] + 1;
+                    break;
                 }
-
             }
 
+        } else
+            inLapCnt[lastElement]++;
 
-            break;
+        // is this strategy okay? Can every tyre solve the given distance?
+        if (hasMorePosibilities(inLapCnt)) {
+            if (!isMakeable(inLapCnt, compounds))
+                inLapCnt = updateInLapCnt(inLapCnt, compounds);
         }
 
-        if (fastestTime < Double.MAX_VALUE) {
-            for (int index = 0; index < tireOrder.size(); index++)
-                tireWithInLap.put(currentFastestInLap[index], tireOrder.get(index));
 
-            tireOrderWithTrackTime.put(tireWithInLap, fastestTime);
+        return inLapCnt;
+    }
+
+    private boolean isMakeable(int[] inLapCnt, Compound[] compounds) {
+
+        for (int index = 0; index < inLapCnt.length - 1; index++) {
+            int lapsToSolve;
+            if (index == 0)
+                lapsToSolve = inLapCnt[index];
+            else
+                lapsToSolve = inLapCnt[index + 1] - inLapCnt[index];
+
+            if (compounds[index].getMax() < lapsToSolve)
+                return false;
         }
+        // check for the last tyre set
+        int lastTyre = compounds.length - 1;
+        return compounds[lastTyre].getMax() >= track.getLaps() - inLapCnt[lastTyre];
+    }
 
+
+    private int getCurrentDistanceForInLapOrder(int[] inLapCnt, Compound[] compounds) {
+        return ArrayHelper.sumArray( ArrayHelper.clipArray(inLapCnt, 0, inLapCnt.length - 1) ) +
+                compounds[compounds.length - 1].getMax();
     }
 
 
     private double computeTrackTime(Compound[] compounds, int[] inLaps) {
         double trackTime = 0.0;
+        int lastElement = compounds.length - 1;
 
-        for (int index = 0; index < compounds.length; index++)
-            trackTime += compounds[index].getTrackTimes()[inLaps[index]];
+        for (int index = 0; index < compounds.length; index++) {
+            Double[] trackTimes = compounds[index].getTrackTimes();
+
+            if (index == 0)
+                trackTime += trackTimes[0];
+            else if (index == lastElement)
+                trackTime += trackTimes[ track.getLaps() - inLaps[index] ];
+            else
+                trackTime += trackTimes[ inLaps[index + 1] - inLaps[index] ];
+        }
 
         return trackTime;
-
     }
 
 
