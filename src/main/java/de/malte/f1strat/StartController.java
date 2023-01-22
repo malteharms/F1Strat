@@ -2,6 +2,7 @@ package de.malte.f1strat;
 
 import de.malte.f1strat.handler.JsonHandler;
 import de.malte.f1strat.helper.Converter;
+import de.malte.f1strat.logic.TyreStrategy;
 import de.malte.f1strat.structure.*;
 
 import javafx.beans.value.ObservableValue;
@@ -135,6 +136,10 @@ public class StartController {
             yAxis.setLowerBound( yMin );
             yAxis.setUpperBound( yMax + LINE_CHART_MARGIN_TOP );
 
+
+            TyreStrategy strategy = new TyreStrategy(neededData, getTrackObject(
+                    data, cbTrack.getValue(), cbCondition.getValue()
+            ));
         });
     }
 
@@ -180,22 +185,27 @@ public class StartController {
     }
 
 
-    private Distance getDistanceObject(DataInstance data, String distance, String track, String condition) {
-        if (condition.equals("Trocken")) {
-            TrackData onDry = switchTrack(data.dry.tracks, track);
-            if (distance.equals("100%")) {
-                return onDry.hundred;
-            }
-            return onDry.fifty;
-        }
-        TrackData onWet = switchTrack(data.wet.tracks, track);
-        if (distance.equals("100%")) {
-            return onWet.hundred;
-        }
-        return onWet.fifty;
+    private Track getTrackObject(DataInstance data, String track, String condition) {
+        Tracks tracks;
+        if (condition.equals("Trocken"))
+            tracks = data.dry.tracks;
+        else
+            tracks = data.wet.tracks;
+
+        return switchTrack(tracks, track);
     }
 
-    private TrackData switchTrack(Tracks data, String track) {
+
+    private Distance getDistanceObject(DataInstance data, String distance, String track, String condition) {
+        Track trackData = getTrackObject(data, track, condition);
+
+        if (distance.equals("100%"))
+            return trackData.trackData.hundred;
+        else
+            return trackData.trackData.fifty;
+    }
+
+    private Track switchTrack(Tracks data, String track) {
         Track whichTrack = switch (track) {
             case "Bahrain" -> data.bahrain;
             case "Jeddah" -> data.jeddah;
@@ -223,6 +233,6 @@ public class StartController {
             default -> data.portuguese;
         };
 
-        return whichTrack.trackData;
+        return whichTrack;
     }
 }

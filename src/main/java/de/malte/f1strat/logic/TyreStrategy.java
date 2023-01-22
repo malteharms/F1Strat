@@ -70,13 +70,15 @@ public class TyreStrategy {
     private void calculateFastestStrategy() {
 
         for (List<String> tireOrder : tireOrders) {
-
+            /*
             switch (tireOrder.size()) {
                 case 2 -> fastestStrategyTwoCompounds(tireOrder);
                 case 3 -> fastestStrategyThreeCompounds(tireOrder);
                 case 4 -> fastestStrategyFourCompounds(tireOrder);
                 case 5 -> fastestStrategyFiveCompounds(tireOrder);
             }
+             */
+            computeFastestStrategy(tireOrder);
         }
     }
 
@@ -208,9 +210,20 @@ public class TyreStrategy {
 
             // update inLapCnt to next position
             inLapCnt[inLapCnt.length - 1]++;
-            if (inLapCnt[inLapCnt.length - 1] > compounds[compounds.length - 1].getMax()) {
-                // tbd
+            if ( compounds[compounds.length - 2].getMax() <
+                    inLapCnt[inLapCnt.length - 1] - inLapCnt[inLapCnt.length - 2] ) {
+
+                int element = 2;
+                while (true) {
+                    inLapCnt[inLapCnt.length - element]++;
+
+                    // arrange previous element to available in lap
+                    inLapCnt[inLapCnt.length - element - 1] = inLapCnt[inLapCnt.length - element] + 1;
+                }
+
             }
+
+
             break;
         }
 
