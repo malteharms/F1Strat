@@ -11,4 +11,5 @@ module de.malte.f1strat {
 
     opens de.malte.f1strat to javafx.fxml;
     exports de.malte.f1strat;
+    exports de.malte.f1strat.helper;
 }

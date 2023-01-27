@@ -1,6 +1,7 @@
 package de.malte.f1strat.logic;
 
 import de.malte.f1strat.helper.ArrayHelper;
+import de.malte.f1strat.helper.StrategyHelper;
 import de.malte.f1strat.structure.Compound;
 import de.malte.f1strat.structure.Distance;
 import de.malte.f1strat.structure.Track;
@@ -31,6 +32,7 @@ public class TyreStrategy {
     Map<Map<Integer, String>, Double> tireOrderWithTrackTime;
 
     public TyreStrategy(Distance track, Track stopTime) {
+        StrategyHelper strategyHelper = new StrategyHelper();
 
         // check if tyre data is available
         if (track.containsData()) {
@@ -54,7 +56,7 @@ public class TyreStrategy {
 
         // generate tyre orders
         for (int i = 0; i < MAX_STOPS - 1; i++) {
-            List<List<String>> cur = generateTireOrders(MAX_STOPS - i, tireTypes, tireCounts);
+            List<List<String>> cur = strategyHelper.generateTireOrders(MAX_STOPS - i, tireTypes, tireCounts);
             tireOrders.addAll(cur);
         }
 
@@ -63,10 +65,10 @@ public class TyreStrategy {
 
         // every tyre order has multiple possibilities for in-laps
         // next step is to look which possibility is the fastest for each tyre order
-        calculateFastestStrategy();
+
     }
 
-    private void calculateFastestStrategy() {
+    public void calculateFastestStrategy() {
 
         for (List<String> tireOrder : tireOrders) {
             Strategy fastestStrategy = computeFastestStrategy(tireOrder);
@@ -82,30 +84,6 @@ public class TyreStrategy {
             case MEDIUM -> track.medium;
             default -> track.hard;
         };
-    }
-
-    private List<List<String>> generateTireOrders(int numLaps, List<String> tireTypes, Map<String, Integer> tireCounts) {
-        List<List<String>> tireOrders = new ArrayList<>();
-        if (numLaps == 0) {
-            // If all laps have tires, return the current tire order
-            tireOrders.add(new ArrayList<>());
-            return tireOrders;
-        }
-
-        // Iterate over all available tire types and call generateTireOrders recursively
-        // if there are still enough tires of the corresponding type available
-        for (String tireType : tireTypes) {
-            if (tireCounts.get(tireType) > 0) {
-                tireCounts.put(tireType, tireCounts.get(tireType) - 1);
-                List<List<String>> orders = generateTireOrders(numLaps - 1, tireTypes, tireCounts);
-                for (List<String> order : orders) {
-                    order.add(0, tireType);
-                }
-                tireOrders.addAll(orders);
-                tireCounts.put(tireType, tireCounts.get(tireType) + 1);
-            }
-        }
-        return tireOrders;
     }
 
 
